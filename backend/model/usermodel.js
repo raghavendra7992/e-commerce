@@ -29,6 +29,10 @@ var userSchema = new mongoose.Schema({
         type:String,
         default:"user",
     },
+    isBlocked:{
+        type:Boolean,
+        default:false,
+    },
     cart:{
         type:Array,
         default:[]
@@ -39,12 +43,18 @@ var userSchema = new mongoose.Schema({
     wishlist:[{
         type:mongoose.Schema.Types.ObjectId,ref:"Product"
     }],
+    refreshToken:{
+        type:String,
+        default:""
+    }
     
    
 },
+
 {
     timestamps:true,
-}
+},
+
 );
 userSchema.pre("save",async function(next){
 const salt=await bcrypt.genSalt(10);

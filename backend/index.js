@@ -6,11 +6,12 @@ const app=express();
 const port=3000||process.env.PORT;
 const dotenv=require('dotenv').config();
 const authRouter=require('./routes/userroute');
+const cookieParser=require("cookie-parser");
 dbconnect()
 // app.use("/",(req,res)=>res.send("my data"))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:false}))
-
+app.use(cookieParser());
 
 app.use("/api/user",authRouter)
 
