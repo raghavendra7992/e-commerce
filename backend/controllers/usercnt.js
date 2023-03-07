@@ -3,7 +3,7 @@ const asynchandler=require("express-async-handler");
 const { genration } = require('../config/jsonweb.js');
 const validateMongoDbId = require('../utilities/valodmongodb.js');
 const refreshToken=require("../config/refreshToken.js")
-
+const jwt=require("jsonwebtoken");
 
 const createUser =asynchandler(async(req, res) => {
   const email=req.body.email;
@@ -117,14 +117,34 @@ const unblockuser=asynchandler(async (req,res) => {
 //handle refresh token
 const handlerefreshtoken=asynchandler(async (req,res) => {
  const cookie=req.cookies;
- if(!cookie?.refreshToken) throw new Error("Nahi chala");
- const Token= cookie.refreshToken;
- const User=await user.findOne({Token});
- if(!user ) throw new Error("no refresh Token")
- 
+ if(!cookie?.Token) throw new Error("Nahi chala");
+ const Token= cookie.Token;
+ jwt.verify(Token,process.env.JWT_SECRET,(err,decoded)=>{
+  if(err) throw new Error("invalid token")
+  const acessToken=genration(decoded.id);
+  res.json({acessToken})
+ });
+});
 
+//Logout funcnality
+const Logoutcontroller=asynchandler(async (req,res) => {
+  const cookie=req.cookies;
+  if(!cookie?.Token) throw new Error("Nahi chala");
+  const Token= cookie.Token;
+  const User=await user.findOne({Token});
+  if(!User) {
+  res.clearCookie("Token",{
+    httpOnly:true,
+    secure:true,
+  });
+  res.status(204);
+  }
+  await user.findByIdAndUpdate(User.id,{Token:""},{new :true});
+  res.clearCookie("Token",{
+    httpOnly:true,
+    secure:true,
+  })
+  res.json({message:"logout successfull"})
 })
 
-
-
-module.exports = {createUser,Logincontroller,getUser,getSingleUser,deleteuser,updateUser,blockuser,unblockuser,handlerefreshtoken};
+module.exports = {createUser,Logincontroller,getUser,getSingleUser,deleteuser,updateUser,blockuser,unblockuser,handlerefreshtoken,Logoutcontroller};
