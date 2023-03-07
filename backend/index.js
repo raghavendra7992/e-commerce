@@ -6,14 +6,21 @@ const app=express();
 const port=3000||process.env.PORT;
 const dotenv=require('dotenv').config();
 const authRouter=require('./routes/userroute');
+const productRouter=require('./routes/productroutes.js');
 const cookieParser=require("cookie-parser");
+const morgan = require('morgan');
 dbconnect()
+
+
+
+app.use(morgan('dev'));
 // app.use("/",(req,res)=>res.send("my data"))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(cookieParser());
 
-app.use("/api/user",authRouter)
+app.use("/api/user",authRouter);
+app.use("/api/product",productRouter)
 
 app.use(boTfound);
 app.use(errorhandler)
