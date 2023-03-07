@@ -2,7 +2,8 @@ const user= require('../model/usermodel.js');
 const asynchandler=require("express-async-handler");
 const { genration } = require('../config/jsonweb.js');
 const validateMongoDbId = require('../utilities/valodmongodb.js');
-const refreshToken=require("../config/refreshToken.js")
+const refreshToken=require("../config/refreshToken.js");
+const crypto=require("crypto");
 const jwt=require("jsonwebtoken");
 
 const createUser =asynchandler(async(req, res) => {
@@ -147,4 +148,78 @@ const Logoutcontroller=asynchandler(async (req,res) => {
   res.json({message:"logout successfull"})
 })
 
-module.exports = {createUser,Logincontroller,getUser,getSingleUser,deleteuser,updateUser,blockuser,unblockuser,handlerefreshtoken,Logoutcontroller};
+
+// update password
+
+const updatepassword=asynchandler(async (req,res) => {
+const {_id}=req.user;
+const {password}=req.body;
+validateMongoDbId(_id);
+const User=await user.findById(_id);
+if(password){
+   User.password=password;
+   const updatepass=await User.save();
+   res.json(updatepass);
+}else{
+  res.json(User)
+}
+})
+
+const forgetpassword=asynchandler(async (req,res) =>{
+  const {email}=req.body;
+  const findUser=await user.findOne({email})
+  if(!findUser) throw new Error("User does not exist")
+  try {
+    const token=await user.createPasswordResetToken();
+    await findUser.save();
+    const reseturl=`Hi this link expire after 10 minutes <a href="https://localhost:3000/api/user/reset.password/${token}>Click Here</a>`;
+    const data={
+      to:email,
+      text:"hey user",
+      subject:"forget password",
+      htm:reseturl,
+    }
+    sendEmail(data);
+    res.json(token)
+  } catch (error) {
+    throw new Error(error)
+  }
+})
+
+//reset password
+const resetpassword=asynchandler(async (req,res)=>{
+  const {password}=req.body;
+  const {token}=req.params;
+  const hashedtoken=crypto.createhash("sha256").update(token).digest("hex");
+  const User = await user.findOne({
+    passwordResetToken:hashedtoken,
+    passwordResetExpires:Date.now() + 10 * 60 * 1000,
+  });
+  if (!User) 
+    throw new Error("Token is invalid or has expired");
+    User.password=password;
+    User.passwordResetToken=undefined;
+    User.passwordResetExpires=undefined;
+    await User.save();
+    res.json(User);
+  
+
+})
+
+
+module.exports = {
+  updatepassword,
+  createUser,
+  Logincontroller,
+  getUser,
+  getSingleUser,
+  deleteuser,
+  updateUser,
+  blockuser,
+  unblockuser,
+  handlerefreshtoken,
+  Logoutcontroller,
+  forgetpassword,
+  resetpassword
+
+};
