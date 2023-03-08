@@ -11,6 +11,7 @@ const blogRouter=require('./routes/blogroute.js');
 const categoryRouter=require('./routes/categoryroutes.js');
 const blogCategoryRouter=require('./routes/blogrcategoryoute.js');
 const brandRouter=require('./routes/brandroutes.js');
+const coupenRouter=require('./routes/coupenrote.js');
 const cookieParser=require("cookie-parser");
 const morgan = require('morgan');
 dbconnect()
@@ -28,7 +29,8 @@ app.use("/api/product",productRouter)
 app.use("/api/blog",blogRouter);
 app.use("/api/category",categoryRouter);
 app.use("/api/blogcategory",blogCategoryRouter);
-app.use("/api/brand",brandRouter)
+app.use("/api/brand",brandRouter);
+app.use("api/coupen",coupenRouter);
 
 
 

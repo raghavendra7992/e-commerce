@@ -153,12 +153,45 @@ const addTowhishlist=asynchandler(async(req,res)=>{
 const rating =asynchandler(async (req, res)=>{
 const {_id}=req.user
 const {star,prodId}=req.body;
+try {
+    
+
 const product=await product.findById(prodId)
 let alreadyrated=product.rating.find((userId)=>userId.postedby.toString()===_id.toString())
 if(alreadyrated){
-    
+const updateRating=await Product.updateOne(
+    {
+    ratings:{$eleMatch:alreadyrated},
+    },
+    {
+        $set:{"ratings.s.star":star,"rating.$.comment":comment},
+    },
+    {new:true,}
+);
+}else{
+    const rateProduct=await Product.findByIdAndUpdate(prodId,{
+        $push:{
+            star:star,
+            postedby:_id,
+        }
+    },{new:true})
+
+};
+const getallrating=await Product.findById(prodId);
+let totalRating =getallrating.rating.length;
+let ratingsum=getallrating.rating.map((item)=>item.star).reduce((prev,curr)=>prev+curr,0);
+let actualRating=Math.round(ratingsum/totalRating);
+let finalproduct=await Product.findByIdAndUpdate(prodId,{
+    totalRating:actualRating,
+},{new:true},)
+res.json(finalproduct);
+}catch(error){
+    throw new Error(error)
 }
-})
+
+
+
+});
 
 
 
