@@ -63,18 +63,16 @@ var userSchema = new mongoose.Schema({
 );
 userSchema.pre("save",async function(next){
 
-    if(this.isModified("password") || this.isNew){
-        const salt=await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password,salt)
+    if(!this.isModified("password")){
+        next();
     }
-
-
-const salt=await bcrypt.genSalt(10);
-this.password = await bcrypt.hash(this.password,salt)
-});
+        const salt=await bcrypt.genSaltSync(10);
+        this.password = await bcrypt.hash(this.password,salt);
+        next();
+    });
 userSchema.methods.isPasswordMatched=async function(enteredPassword){
     return await bcrypt.compare(enteredPassword,this.password);
-}
+};
 userSchema.methods.createPasswordResetToken=async function(){
     const resetToken=crypto.randomBytes(32).toString("hex");
     this.passwordResetToken=crypto

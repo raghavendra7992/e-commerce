@@ -6,6 +6,10 @@ const refreshToken=require("../config/refreshToken.js");
 const crypto=require("crypto");
 const jwt=require("jsonwebtoken");
 
+
+
+
+
 const createUser =asynchandler(async(req, res) => {
   const email=req.body.email;
   const findUser=await user.findOne({email:email});
@@ -20,30 +24,38 @@ const createUser =asynchandler(async(req, res) => {
 const Logincontroller=asynchandler(async (req, res) => {
   const {email,password}=req.body;
   
-
-  const findUser=await user.findOne({email:email});
-  if(findUser&&await findUser.isPasswordMatched(password)){
+  const findUser=await user.findOne({email});
+  console.log(findUser)
+  if(findUser && (await findUser.isPasswordMatched(password))){
     const Token=await refreshToken(findUser?._id);
-     const updateuser=await user.findByIdAndUpdate(findUser.id,
+     const updateuser=await user.findByIdAndUpdate(
+      findUser.id,
       {
       Token:Token,
-     },{new :true});
+     },
+     {new :true}
+     );
      res.cookie("Token",Token,{
      httpOnly:true,
-     maxAge:72 * 60 * 60 * 1000,
+     maxAge : 3600000,
      });
         res.json({
-    id:findUser?._id,
+    _id:findUser?._id,
     firstname:findUser?.firstname,
     lastname:findUser?.lastname,
     email:findUser?.email,
     mobile:findUser?.mobile,
-    token:genration(findUser?._id)
+    token:genration(findUser?._id),
    });
   }else{
-    throw new Error("User does not exist")
+    throw new Error("login not working")
   }
 });
+
+
+
+
+
 const getUser=asynchandler(async (req,res) => {
   try {
     const getalluser=await user.find();
@@ -193,7 +205,7 @@ const resetpassword=asynchandler(async (req,res)=>{
   const hashedtoken=crypto.createhash("sha256").update(token).digest("hex");
   const User = await user.findOne({
     passwordResetToken:hashedtoken,
-    passwordResetExpires:Date.now() + 10 * 60 * 1000,
+    passwordResetExpires:{$gt:Date.now() + 10 * 60 * 1000},
   });
   if (!User) 
     throw new Error("Token is invalid or has expired");
@@ -204,7 +216,7 @@ const resetpassword=asynchandler(async (req,res)=>{
     res.json(User);
   
 
-})
+});
 
 
 module.exports = {

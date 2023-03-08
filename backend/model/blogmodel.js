@@ -18,11 +18,11 @@ var blogSchema = new mongoose.Schema({
         type:Number,
         default:0,
     },
-    isliked:{
+    isLiked:{
         type:Boolean,
         default:false,
     },
-    isdislikes:
+    isDisliked:
     {type:Boolean,
         default:false,
     },
@@ -35,7 +35,7 @@ var blogSchema = new mongoose.Schema({
         ref:'user',
     },
     image:{
-        type:string,
+        type:String,
         default:"https://images.pexels.com/photos/262508/pexels-photo-262508.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
     },
     author:{
