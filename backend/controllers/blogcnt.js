@@ -43,7 +43,7 @@ const getBlog=asynchandler(async(req,res)=>{
     const {id}=req.params;
     validateMongoDbId(id)
     try {
-        const blog=await Blog.findById(id);
+        const blog=await Blog.findById(id).populate("views");
         const views=await Blog.findByIdAndUpdate(
             id,
             {$inc:{views:1}},
