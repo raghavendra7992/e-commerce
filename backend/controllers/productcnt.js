@@ -1,4 +1,5 @@
 const Product=require("../model/productModdel.js");
+const User =require("../model/usermodel.js")
 const asynchandler=require('express-async-handler');
 const slugify=require('slugify');
 const { json } = require("body-parser");
@@ -115,6 +116,49 @@ const deleteProduct=asynchandler(async(req,res)=>{
         throw new Error(error);
     }
 })
+  
+
+//whishlist
+const addTowhishlist=asynchandler(async(req,res)=>{
+    const {_id}=req.user;
+    const {prodId}=req.body;
+    try {
+        const user= await User.findById(_id);
+        const alreadyAdded=user.whishlist.find((id)=>id.toString().toLowerCase===prodId);
+        if(alreadyAdded){
+            let user=await User.findByIdAndUpdate(_id,{
+                $push:{
+                    whishlist:prodId
+                }
+            },
+            {new:true});
+            res.json(user);
+        }else{
+            let user=await User.findByIdAndUpdate(_id,{
+                $push:{
+                    whishlist:prodId
+                }
+            },
+            {new:true});
+            res.json(user);
+        }
+    } catch (error) {
+        throw new Error(error);
+    }
+})
+
+
+
+//rating
+const rating =asynchandler(async (req, res)=>{
+const {_id}=req.user
+const {star,prodId}=req.body;
+const product=await product.findById(prodId)
+let alreadyrated=product.rating.find((userId)=>userId.postedby.toString()===_id.toString())
+if(alreadyrated){
+    
+}
+})
 
 
 
@@ -123,7 +167,9 @@ module.exports=
     getProduct,
     getAllProducts,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    addTowhishlist,
+    rating
 
 
 
