@@ -3,13 +3,13 @@ const cloudinary=require('cloudinary');
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.API_KEY,
-    api_secret: process.env.API_SECRET
+    api_secret: process.env.API_SECRET,
 });
 
 
-const cloudinaryuploadimage= async (fileTouploads)=>{
-    return new promises((resolve)=>{
-        cloudinary.uploader.upload(fileTouploads,(result)=>{
+const cloudinaryuploadimage= async (fileToUploads)=>{
+    return new Promise((resolve)=>{
+        cloudinary.uploader.upload(fileToUploads,(result)=>{
             resolve({
                 url: result.secure_url,
             },

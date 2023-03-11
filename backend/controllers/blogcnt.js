@@ -245,6 +245,7 @@ const Bloguploadimages=asynchandler(async (req,res)=>{
             },
             {new:true},
         )
+        res.json(findBlog)
     } catch (error) {
         throw new Error(error)
     }

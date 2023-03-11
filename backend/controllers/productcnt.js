@@ -178,6 +178,7 @@ const updateRating=await Product.updateOne(
     },{new:true})
 
 };
+
 const getallrating=await Product.findById(prodId);
 let totalRating =getallrating.rating.length;
 let ratingsum=getallrating.rating.map((item)=>item.star).reduce((prev,curr)=>prev+curr,0);
@@ -201,21 +202,20 @@ const uploadImages=asynchandler(async (req,res)=>{
     validateMongoDbId(id);
     console.log(req.files)
     try {
-        const uploader=(path)=>cloudinaryUploadImg(path,"images");
+        const uploader=(path)=>cloudinaryUploadImg(path,"image");
         const urls=[];
         const files=req.files;
         for(const file of files){
-            const {path}=file
-            const newpattth=await uploader(path);
-            console.log(newpattth)
-            urls.push(newpattth);
+            const {path}=file;
+            const newpath=await uploader(path);
+            urls.push(newpath);
             fs.unlinkSync(path);
         }
         const findProduct=await Product.findByIdAndUpdate(
             id,
             {
-                images:urls.map((files)=>{
-                    return files;
+                images:urls.map((file)=>{
+                    return file;
                 }),
             },
             {new:true}
@@ -229,7 +229,8 @@ const uploadImages=asynchandler(async (req,res)=>{
 
 
 module.exports=
-{createProduct,
+{ 
+    createProduct,
     getProduct,
     getAllProducts,
     updateProduct,
@@ -237,10 +238,6 @@ module.exports=
     addTowhishlist,
     rating,
     uploadImages
-
-
-
-
 }
 
 
