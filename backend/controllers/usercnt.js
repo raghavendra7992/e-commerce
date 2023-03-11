@@ -160,6 +160,23 @@ const Logoutcontroller=asynchandler(async (req,res) => {
   res.json({message:"logout successfull"})
 })
 
+//save address
+const saveAddress=asynchandler(async (req,res)=>{
+  const {_id}=req.user;
+  validateMongoDbId(_id);
+  try {
+    const upadateuser=await user.findByIdAndUpdate(_id,{
+      address:req?.body?.address,
+    },
+    {new:true},);
+    res.json(upadateuser)
+  } catch (error) {
+    throw new Error(error)
+  }
+})
+
+
+
 
 // update password
 
@@ -253,7 +270,19 @@ const AdminLogincontroller=asynchandler(async (req, res) => {
   }
 });
 
+// get whishlist
 
+
+const getWhishlist=asynchandler(async (req,res)=>{
+  const {_id}=req.user;
+  try {
+    const findUser=await user.findById(_id).populate('wishlist')
+    res.json(findUser);
+  } catch (error) {
+    throw new Error(error)
+    
+  }
+})
 
 module.exports = {
   updatepassword,
@@ -269,6 +298,8 @@ module.exports = {
   Logoutcontroller,
   forgetpassword,
   resetpassword,
-  AdminLogincontroller
+  AdminLogincontroller,
+  getWhishlist,
+  saveAddress
 
 };
