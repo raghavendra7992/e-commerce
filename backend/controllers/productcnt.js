@@ -2,8 +2,9 @@ const Product=require("../model/productModdel.js");
 const User =require("../model/usermodel.js")
 const asynchandler=require('express-async-handler');
 const slugify=require('slugify');
-const { json } = require("body-parser");
-
+const validateMongoDbId = require("../utilities/valodmongodb");
+const cloudinaryUploadImg=require('../utilities/cloudinary.js')
+const fs=require('fs')
 
 
 const createProduct=asynchandler(async(req,res)=>{
@@ -195,6 +196,38 @@ res.json(finalproduct);
 
 
 
+const uploadImages=asynchandler(async (req,res)=>{
+    const {id}=req.params;
+    validateMongoDbId(id);
+    console.log(req.files)
+    try {
+        const uploader=(path)=>cloudinaryUploadImg(path,"images");
+        const urls=[];
+        const files=req.files;
+        for(const file of files){
+            const {path}=file
+            const newpattth=await uploader(path);
+            console.log(newpattth)
+            urls.push(newpattth);
+            fs.unlinkSync(path);
+        }
+        const findProduct=await Product.findByIdAndUpdate(
+            id,
+            {
+                images:urls.map((files)=>{
+                    return files;
+                }),
+            },
+            {new:true}
+        )
+        res.json(findProduct);
+    } catch (error) {
+        throw new Error(error)
+    }
+
+})
+
+
 module.exports=
 {createProduct,
     getProduct,
@@ -202,7 +235,8 @@ module.exports=
     updateProduct,
     deleteProduct,
     addTowhishlist,
-    rating
+    rating,
+    uploadImages
 
 
 

@@ -1,10 +1,13 @@
 const express=require("express");
-const { createProduct, getProduct, getAllProducts, updateProduct, deleteProduct, addTowhishlist, rating } = require("../controllers/productcnt");
-const {isAdmin,authmidd}=require("../middleware/authmiddleware.js")
+const { createProduct, getProduct, getAllProducts, updateProduct, deleteProduct, addTowhishlist, rating, uploadImages } = require("../controllers/productcnt");
+const {isAdmin,authmidd}=require("../middleware/authmiddleware.js");
+const { uploadPhoto, productImageResize } = require("../middleware/uploadimage");
 const router=express.Router();
 
+router.put('/upload/:id',authmidd,isAdmin,uploadPhoto.array('images',10),
+productImageResize,uploadImages)
+router.post('/',authmidd,isAdmin,createProduct);
 
-router.post('/',authmidd,isAdmin,createProduct)
 router.get('/:id',getProduct);
 router.put("/whishlist",authmidd,addTowhishlist);
 router.put("/rating",authmidd,rating)
