@@ -219,6 +219,42 @@ const resetpassword=asynchandler(async (req,res)=>{
 });
 
 
+
+// admin login funcanility
+const AdminLogincontroller=asynchandler(async (req, res) => {
+  const {email,password}=req.body;
+  
+  const findAdmin=await user.findOne({email});
+  if(findAdmin.Role!=="admin") throw new Error(error)
+
+  if(findAdmin && (await findAdmin.isPasswordMatched(password))){
+    const Token=await refreshToken(findAdmin?._id);
+     const updateuser=await user.findByIdAndUpdate(
+      findAdmin.id,
+      {
+      Token:Token,
+     },
+     {new :true}
+     );
+     res.cookie("Token",Token,{
+     httpOnly:true,
+     maxAge : 3600000,
+     });
+        res.json({
+    _id:findAdmin?._id,
+    firstname:findAdmin?.firstname,
+    lastname:findAdmin?.lastname,
+    email:findAdmin?.email,
+    mobile:findAdmin?.mobile,
+    token:genration(findAdmin?._id),
+   });
+  }else{
+    throw new Error("login not working")
+  }
+});
+
+
+
 module.exports = {
   updatepassword,
   createUser,
@@ -232,6 +268,7 @@ module.exports = {
   handlerefreshtoken,
   Logoutcontroller,
   forgetpassword,
-  resetpassword
+  resetpassword,
+  AdminLogincontroller
 
 };
