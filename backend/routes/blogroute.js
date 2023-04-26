@@ -19,6 +19,7 @@ router.put('/:id',authmidd,isAdmin,updateBlog);
 
 router.get('/:id',getBlog)
 
+
 router.get("/",getAllBlog)
 
 router.delete("/:id",authmidd,isAdmin,deleteBlog)
