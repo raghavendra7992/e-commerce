@@ -3,8 +3,8 @@ const{ createUser, Logincontroller, getUser, getSingleUser, deleteuser, updateUs
 const { authmidd, isAdmin } = require('../middleware/authmiddleware');
 const router=express.Router();
 router.post("/register",createUser)
-router.post("/forget",forgetpassword)
-router.post("/reset/:token",resetpassword)
+// router.post("/forget",forgetpassword)
+// router.post("/reset/:token",resetpassword)
 router.post("/login",Logincontroller);
 router.post("/admin",AdminLogincontroller)
 router.get("/alluser",getUser);
@@ -30,6 +30,6 @@ router.put("/update",authmidd,updateUser)
 router.put("/saveaddress",authmidd,saveAddress)
 router.put("/block/:id",authmidd,isAdmin,blockuser)
 router.put("/unblock/:id",authmidd,isAdmin,unblockuser);
-router.put("/updatepassword",authmidd,updatepassword)
+// router.put("/updatepassword",authmidd,updatepassword)
 
 module.exports =router;
